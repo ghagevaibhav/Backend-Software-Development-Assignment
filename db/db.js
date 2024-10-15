@@ -14,12 +14,12 @@ catch(e){
 const comicSchema = new Schema({
     bookName: {type: String, trim: true, unique: true},
     authorName: {type: String, trim: true},
-    yearOfPublication: Number,
-    price: Number,
+    yearOfPublication: {type: Number},
+    price: {type: Number},
     discount: {type: Number, default: 0, max: 100, min: 0},
-    numberOfPages: Number,
+    numberOfPages: {type: Number},
     condition: {type: String, enum: ['new', 'used'], default: 'new'},
-    description: String,
+    description: {type: String},
 })
 
 const Comic = model('comics', comicSchema);
