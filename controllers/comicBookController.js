@@ -1,18 +1,7 @@
 const express = require('express');
 const router = express.Router();
-const { Comic } = require('/db/db.js');
-const zod = require('zod');
-
-const comicBody = zod.object({
-    bookName: zod.string(),
-    authorName: zod.string(),
-    yearOfPublication: zod.number(),
-    price: zod.number(),
-    discount: zod.number().min(0).max(100),
-    numberOfPages: zod.number(),
-    condition: zod.string(),
-    description: zod.string().isOptional(true),
-})
+const { Comic } = require('/models/ComicBook');
+// const 
 
 // creates a comic in the db with provided information
 router.post('/createComic', async (req, res) => {
@@ -89,20 +78,18 @@ router.delete('/deleteComic/:id', async (req, res) => {
     }
 
     const comic = await Comic.findOne({_id: req.params.id});
-
     if(!comic){
         return res.status(404).json({message: 'Comic Not in Database'});
     }
 
     await comic.deleteOne({_id: req.params.id});
-
     return res.status(200).json({message: 'Comic Deleted'});
 })
 
 // fetch inventory list and provide pagination and sorting options 
 
 router.get('/inventory', async (req, res) => {
-    
+
 })
 
 //returns individual comic details based on it's id
