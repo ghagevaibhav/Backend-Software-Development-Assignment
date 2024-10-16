@@ -14,6 +14,7 @@ const comicBody = zod.object({
     description: zod.string().isOptional(true),
 })
 
+// creates a comic in the db with provided information
 router.post('/createComic', async (req, res) => {
     const {success} = comicBody.safeParse(req.body);
     if(!success) {
@@ -26,16 +27,7 @@ router.post('/createComic', async (req, res) => {
         return res.status(400).json({message: 'Book with this name already exists'});
     }
 
-    await Comic.create({
-        bookName: req.body.bookName,
-        authorName: req.body.authorName,
-        yearOfPublication: req.body.yearOfPublication,
-        price: req.body.price,
-        discount: req.body.discount,
-        numberOfPages: req.body.numberOfPages,
-        condition: req.body.condition,
-        description: req.body.description,
-    });
+    await Comic.create(req.body);
 
     res.status(201).json({message: 'Comic Created'});
 })
@@ -51,7 +43,7 @@ const comicUpdateBody = zod.object({
     description: zod.string().optional(),
 })
 
-
+// updates the comic data whatever data is provided in the req body
 router.put('/updateComic/:id', async (req, res) => {
         const { success } = comicUpdateBody.safeParse(req.body);
 
@@ -82,4 +74,44 @@ router.put('/updateComic/:id', async (req, res) => {
             message: 'Comic Updated',
             updatedComic: Comic.findOne({_id: req.params.id}),
         })
+})
+
+const deleteComicBody = zod.object({
+    id: zod.string(),
+})
+
+//deletes a comic from the database based on its id
+router.delete('/deleteComic/:id', async (req, res) => {
+    const { success } = deleteComicBody.safeParse(req.body);
+
+    if(!success){
+        return res.status(400).json({message: 'Incorrect Inputs Provided'});
+    }
+
+    const comic = await Comic.findOne({_id: req.params.id});
+
+    if(!comic){
+        return res.status(404).json({message: 'Comic Not in Database'});
+    }
+
+    await comic.deleteOne({_id: req.params.id});
+
+    return res.status(200).json({message: 'Comic Deleted'});
+})
+
+// fetch inventory list and provide pagination and sorting options 
+
+router.get('/inventory', async (req, res) => {
+    
+})
+
+//returns individual comic details based on it's id
+router.get('/individualComic/:id', async (req, res) => {
+    const comic = await Comic.findOne({_id: req.params.id});
+    
+    if(!comic){
+        return res.status(404).json({message: 'Comic Not Found'});
+    }
+
+    return res.status(200).json(comic);
 })
