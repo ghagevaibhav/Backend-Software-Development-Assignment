@@ -38,6 +38,9 @@ router.post('/createComic', async (req, res) => {
     });
 
     res.status(201).json({message: 'Comic Created'});
+})
 
+router.put('/updateComic', (req, res) => {
+    
 })
 
