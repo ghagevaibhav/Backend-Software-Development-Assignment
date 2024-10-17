@@ -1,11 +1,14 @@
 
 const express = require('express');
-const comicBookController = require('./controllers/comicBookController');
 const router = express.Router();
+const comicBookController = require('../controllers/comicBookController');
 
 router
-.route('/')
+.route('/getAllComicBooks')
 .get(comicBookController.getAllComicBooks)
+
+router
+.route('/createComicBook')
 .post(comicBookController.createComicBook)
 
 router

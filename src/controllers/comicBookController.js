@@ -1,5 +1,5 @@
-const { Comic } = require('/models/ComicBook');
-const { comicBookSchema } = require('./schemas/comicBookSchema');
+const { Comic } = require('../models/ComicBook');
+const { comicBookSchema } = require('../schemas/comicBookSchema');
 
 const handleError = (error, res) => {
     if(error.name == 'ZodError'){
@@ -24,22 +24,17 @@ const handleError = (error, res) => {
 }
 
 // creates a comic in the db with provided information
-exports.createComicBook =  async (req, res) => {
+exports.createComicBook = async (req, res) => {
     try{
-        const {success} = comicBookSchema.safeParse(req.body);
-        if(!success) {
-            return res.status(400).json({message: 'Incorrect Inputs Provided'});
-        }
-        
-        const existingBook = Comic.findOne({bookName: req.body.bookName})
-        
-        if(existingBook){
-            return res.status(400).json({message: 'Book with this name already exists'});
-        }
-        
-        await Comic.create(req.body);
-        
-        res.status(201).json({message: 'Comic Created'});
+        console.log('Received request body:', req.body);
+        const newComicBook = await ComicBook.create(req.body);
+        console.log('Created new comic book:', newComicBook);
+        return  res.status(201).json({
+          status: 'success',
+          data: {
+            comicBook: newComicBook
+          }
+        });
     }
     catch(error){
         handleError(error, res);
@@ -126,7 +121,7 @@ exports.getAllComicBooks = async (req, res) => {
       
           const total = await ComicBook.countDocuments(JSON.parse(queryStr));
       
-          res.status(200).json({
+          return res.status(200).json({
             status: 'success',
             results: comicBooks.length,
             total,
