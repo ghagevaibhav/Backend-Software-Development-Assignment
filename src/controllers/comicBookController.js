@@ -1,8 +1,8 @@
-const { Comic } = require('../models/ComicBook');
+const Comic = require('../models/ComicBook');
 const { comicBookSchema } = require('../schemas/comicBookSchema');
 
 const handleError = (error, res) => {
-    if(error.name == 'ZodError'){
+    if(error.name === 'ZodError'){
         const errors = error.errors.map(err => `${err.path.join('.')} : ${err.message}`);
         return res.status(400).json({
             message: 'Validation Error',
@@ -10,26 +10,26 @@ const handleError = (error, res) => {
         });
     }
 
-    if(error.name == 'CastError'){
+    if(error.name === 'CastError'){
         return res.status(400).json({
             message: 'Invalid ID Error',
         });
     }
 
-    console.log(error);
+    console.error(error);
 
     return res.status(500).json({
-        message: 'An Unexpected Error Occured',
+        message: 'An Unexpected Error Occurred',
     });
 }
 
-// creates a comic in the db with provided information
 exports.createComicBook = async (req, res) => {
     try{
         console.log('Received request body:', req.body);
-        const newComicBook = await ComicBook.create(req.body);
+        const validatedData = comicBookSchema.parse(req.body);
+        const newComicBook = await Comic.create(validatedData);
         console.log('Created new comic book:', newComicBook);
-        return  res.status(201).json({
+        return res.status(201).json({
           status: 'success',
           data: {
             comicBook: newComicBook
@@ -44,28 +44,19 @@ exports.createComicBook = async (req, res) => {
 // updates the comic data whatever data is provided in the req body
 exports.updateComicBook = async (req, res) => {
     try{
-        
         const validData = comicBookSchema.partial().parse(req.body);
         
-        if(!success){
-            return res.status(400).json({message: 'Incorrect Inputs Provided'});
-        }
-        
-        const comic = await Comic.findByIdAndUpdate({_id: req.params.id}, validData, {
-            new: true,
-            runValidators: true,
-        });
+        const comic = await Comic.findByIdAndUpdate({_id: req.params.id}, validData);
         if(!comic){
             return res.status(404).json({message: 'Comic Not in Database'});
         }
         
         return res.status(201).json({
             message: 'Comic Updated',
-            updatedComic: Comic.findOne({_id: req.params.id}),
         })
     }
     catch(error){
-        handleError(error, res);
+        handleError(error, res); 
     }
 }
 
@@ -116,10 +107,10 @@ exports.getAllComicBooks = async (req, res) => {
           const skip = (page - 1) * limit;
       
           query = query.skip(skip).limit(limit);
-      
+       
           const comicBooks = await query;
       
-          const total = await ComicBook.countDocuments(JSON.parse(queryStr));
+          const total = await Comic.countDocuments(JSON.parse(queryStr));
       
           return res.status(200).json({
             status: 'success',

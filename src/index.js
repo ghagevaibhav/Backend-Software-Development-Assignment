@@ -1,7 +1,7 @@
-
 const cors = require('cors');
 const dotenv = require('dotenv')
 const express = require('express');
+const mongoose = require('mongoose');
 const connectDB = require('./config/db');
 const comicBookRoutes = require('./routes/comicBookRoute');
 
@@ -12,28 +12,32 @@ function connectWithRetry(){
     connectDB()
     .then(() => {
         console.log('Database Connected Successfully')
+        startServer();
     })
     .catch((err) => {
-        console.error(err);
+        console.error('Database connection error:', err);
+        console.log('Retrying in 5 seconds...');
         setTimeout(connectWithRetry, 5000);
     });
 }
 
-connectWithRetry();
-    
-app.use(express.json());
-app.use(cors)
+function startServer() {
+    app.use(express.json());
+    app.use(cors());
 
+    app.use('/api/v1', comicBookRoutes);
 
-app.use('/api/v1' , comicBookRoutes);
-app.use((err, req, res, next) => {
-    console.log(err);
-    res.status(500).json({
-        message: 'An unexpected error occured'
+    app.use((err, req, res, next) => {
+        console.error(err);
+        res.status(500).json({
+            message: 'An unexpected error occurred'
+        });
     });
-});
 
-const PORT = process.env.PORT || 3000;
-app.listen(PORT, () => {
-    console.log(`Server is running on port ${PORT}`);
-})
+    const PORT = process.env.PORT || 3000;
+    app.listen(PORT, () => {
+        console.log(`Server is running on port ${PORT}`);
+    });
+}
+
+connectWithRetry();
