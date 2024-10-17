@@ -1,5 +1,6 @@
 const { z } = require('zod');
 
+// Define the input validation schema for a comic book object using zod
 const currentYear = new Date().getFullYear();
 
 const comicBookSchema = z.object({
@@ -13,4 +14,5 @@ condition: z.enum(['new', 'used'], 'Condition must be either "new" or "used"'),
 description: z.string().max(1000, 'Description cannot be more than 1000 characters').optional(),
 });
 
+// Export the schema for use in other files
 module.exports = { comicBookSchema };

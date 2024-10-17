@@ -1,8 +1,9 @@
 const Comic = require('../models/ComicBook');
 const { comicBookSchema } = require('../schemas/comicBookSchema');
 
+// Construct a function to handle errors and return appropriate responses
 const handleError = (error, res) => {
-    if(error.name === 'ZodError'){
+    if(error.name === 'ZodError'){ // ZodError
         const errors = error.errors.map(err => `${err.path.join('.')} : ${err.message}`);
         return res.status(400).json({
             message: 'Validation Error',
@@ -10,26 +11,27 @@ const handleError = (error, res) => {
         });
     }
 
-    if(error.name === 'CastError'){
+    if(error.name === 'CastError'){ // CastError
         return res.status(400).json({
             message: 'Invalid ID Error',
         });
     }
 
-    console.error(error);
+    console.error(error); // Error
 
-    return res.status(500).json({
+    return res.status(500).json({ // return a generic error message
         message: 'An Unexpected Error Occurred',
     });
 }
 
+// to create a new comic book in the database
 exports.createComicBook = async (req, res) => {
     try{
         console.log('Received request body:', req.body);
-        const validatedData = comicBookSchema.parse(req.body);
-        const newComicBook = await Comic.create(validatedData);
+        const validatedData = comicBookSchema.parse(req.body); // validate the data
+        const newComicBook = await Comic.create(validatedData); // create a new comic book in the database
         console.log('Created new comic book:', newComicBook);
-        return res.status(201).json({
+        return res.status(201).json({  // return a success response
           status: 'success',
           data: {
             comicBook: newComicBook
@@ -37,26 +39,27 @@ exports.createComicBook = async (req, res) => {
         });
     }
     catch(error){
-        handleError(error, res);
+        handleError(error, res); // handle any errors that occur during the process
     }
 };
 
 // updates the comic data whatever data is provided in the req body
 exports.updateComicBook = async (req, res) => {
     try{
-        const validData = comicBookSchema.partial().parse(req.body);
+        const validData = comicBookSchema.partial().parse(req.body); // validate the data
         
-        const comic = await Comic.findByIdAndUpdate({_id: req.params.id}, validData);
+        const comic = await Comic.findByIdAndUpdate({_id: req.params.id}, validData); // find and update the comic book
         if(!comic){
-            return res.status(404).json({message: 'Comic Not in Database'});
+            return res.status(404).json({message: 'Comic Not in Database'}); // return if comic not in db
         }
         
-        return res.status(201).json({
-            message: 'Comic Updated',
+        return res.status(201).json({ // return success response
+            status: 'success',
+            message: 'Comic Updated'
         })
     }
     catch(error){
-        handleError(error, res); 
+        handleError(error, res);  // handle error that occurrs during update
     }
 }
 
@@ -64,22 +67,23 @@ exports.updateComicBook = async (req, res) => {
 //deletes a comic from the database based on its id
 exports.deleteComicBook = async (req, res) => {
     try{
-        const comicBook = await Comic.findByIdAndDelete(req.params.id);    
+        const comicBook = await Comic.findByIdAndDelete(req.params.id);    // find and delete comic book 
         if(!comicBook){
-            return res.status(404).json({message: 'Comic Not in Database'});
+            return res.status(404).json({message: 'Comic Not in Database'});  // return if comic not in db
         }
         
-        return res.status(200).json({message: 'Comic Deleted'});
+        return res.status(200).json({message: 'Comic Deleted'}); // return if comic deleted successfully
     }
-    catch(error) {
-        handleError(error, res);
+    catch(error) { 
+        handleError(error, res); // handle error that occurrs during deletion
     }
 }
 
 // fetch inventory list and provide pagination and sorting options 
 exports.getAllComicBooks = async (req, res) => {
     try{
-        const queryObj = { ...req.query};
+        // 
+        const queryObj = { ...req.query}; 
         const excludeFields = ['page', 'sort', 'limit', 'fields'];
         excludeFields.forEach(el => delete queryObj[el]);
 
