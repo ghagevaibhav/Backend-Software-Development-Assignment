@@ -11,10 +11,6 @@ This is a backend application for managing a comic book inventory, built with No
 3. [Configuration](#configuration)
 4. [Running the Application](#running-the-application)
 5. [API Endpoints](#api-endpoints)
-6. [Usage Examples](#usage-examples)
-7. [Troubleshooting](#troubleshooting)
-8. [Contributing](#contributing)
-9. [License](#license)
 
 ## Prerequisites
 
