@@ -16,4 +16,4 @@ const comicSchema = new Schema({
 // Create and export a Mongoose model for the comic book object using the schema
 const Comic = model('ComicBook', comicSchema);
 
-module.exports = Comic;
+module.exports = Comic; // export the schema for use in other files

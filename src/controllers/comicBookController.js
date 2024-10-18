@@ -82,16 +82,20 @@ exports.deleteComicBook = async (req, res) => {
 // fetch inventory list and provide pagination and sorting options 
 exports.getAllComicBooks = async (req, res) => {
     try{
-        // 
+        // get query obj
         const queryObj = { ...req.query}; 
+        // exclude fields from query obj  (not allowed fields for pagination and sorting) ex. page,sort,limit,fields
         const excludeFields = ['page', 'sort', 'limit', 'fields'];
         excludeFields.forEach(el => delete queryObj[el]);
 
+        // stringify query and convert to equivalent mongo operation
         let queryStr = JSON.stringify(queryObj);
         queryStr = queryStr.replace(/\b(gt|gte|lt|lte|in)\b/g, match => `$${match}`);
 
+        //  query db based on queryStr
         let query = Comic.find(JSON.parse(queryStr));
 
+        // sorting
         if (req.query.sort) {
             const sortBy = req.query.sort.split(',').join(' ');
             query = query.sort(sortBy);
@@ -99,6 +103,7 @@ exports.getAllComicBooks = async (req, res) => {
             query = query.sort('-createdAt');
           }
       
+          // fields selection
           if (req.query.fields) {
             const fields = req.query.fields.split(',').join(' ');
             query = query.select(fields);
@@ -106,16 +111,20 @@ exports.getAllComicBooks = async (req, res) => {
             query = query.select('-__v');
           }
       
+          // pagination
           const page = parseInt(req.query.page, 10) || 1;
           const limit = parseInt(req.query.limit, 10) || 10;
           const skip = (page - 1) * limit;
       
+          // skip and limit
           query = query.skip(skip).limit(limit);
        
           const comicBooks = await query;
       
+          // count total documents that match the queryStr
           const total = await Comic.countDocuments(JSON.parse(queryStr));
       
+          // return success response with pagination and sorting options
           return res.status(200).json({
             status: 'success',
             results: comicBooks.length,
@@ -128,7 +137,7 @@ exports.getAllComicBooks = async (req, res) => {
           });
         } 
     catch (error) {
-        handleError(error, res);
+        handleError(error, res); // handle error that occurrs during fetching
     }
     
 }
@@ -136,15 +145,15 @@ exports.getAllComicBooks = async (req, res) => {
 //returns individual comic details based on it's id
 exports.getComicBook = async (req, res) => {
     try{
-        const comic = await Comic.findById({_id: req.params.id});
+        const comic = await Comic.findById({_id: req.params.id}); // find specific comic book based on id
         
-        if(!comic){
+        if(!comic){  // if not found return 404 response
             return res.status(404).json({message: 'Comic Not Found'});
         }
         
-        return res.status(200).json(comic);
+        return res.status(200).json(comic); // if found return comic book details
     }
     catch(error){
-        handleError(error, res);
+        handleError(error, res); // handle error that occurrs during fetching
     }
 }
