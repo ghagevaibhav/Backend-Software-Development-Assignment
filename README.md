@@ -1,4 +1,3 @@
-    ## Comic Book Inventory Management System
 
 ## Description
 
