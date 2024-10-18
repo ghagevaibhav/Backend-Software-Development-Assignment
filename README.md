@@ -79,3 +79,12 @@ The API provides the following endpoints:
 * `GET /api/v1/getComicBook/:id`: Get a specific comic book
 * `PATCH /api/v1/updateComicBook/:id`: Update a comic book
 * `DELETE /api/v1/deleteComicBook/:id`: Delete a comic book
+
+ ## API Collection Link
+
+ This is a api collection in public workspace
+
+ `https://www.postman.com/security-architect-36354480/workspace/public-workspace/collection/21425258-91b6cd69-ada4-4dfb-ab0f-8f244b0e8282?action=share&creator=21425258`
+
+ 
+#### I have also added the json file for api collection
